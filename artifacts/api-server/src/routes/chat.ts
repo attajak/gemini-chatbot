@@ -30,7 +30,7 @@ router.post("/chat", requireAuth, async (req: AuthRequest, res) => {
       (m: any) => m.content && (typeof m.content === "string" ? m.content.length > 0 : m.content.length > 0)
     );
 
-    const result = streamText({
+    const result = await streamText({
       model: geminiProModel,
       system: `
         - you help users book flights!

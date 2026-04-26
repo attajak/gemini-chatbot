@@ -1,9 +1,11 @@
 import { SignJWT, jwtVerify } from "jose";
 import type { Request, Response, NextFunction } from "express";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "changeme-set-auth-secret"
-);
+const authSecret = process.env.AUTH_SECRET;
+if (!authSecret) {
+  throw new Error("AUTH_SECRET environment variable is required but was not set.");
+}
+const SECRET_KEY = new TextEncoder().encode(authSecret);
 
 export interface SessionUser {
   id: string;
