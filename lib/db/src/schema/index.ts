@@ -1,20 +1,43 @@
-// Export your models here. Add one export per file
-// export * from "./posts";
-//
-// Each model/table should ideally be split into different files.
-// Each model/table should define a Drizzle table, insert schema, and types:
-//
-//   import { pgTable, text, serial } from "drizzle-orm/pg-core";
-//   import { createInsertSchema } from "drizzle-zod";
-//   import { z } from "zod/v4";
-//
-//   export const postsTable = pgTable("posts", {
-//     id: serial("id").primaryKey(),
-//     title: text("title").notNull(),
-//   });
-//
-//   export const insertPostSchema = createInsertSchema(postsTable).omit({ id: true });
-//   export type InsertPost = z.infer<typeof insertPostSchema>;
-//   export type Post = typeof postsTable.$inferSelect;
+import { Message } from "ai";
+import { InferSelectModel } from "drizzle-orm";
+import {
+  pgTable,
+  varchar,
+  timestamp,
+  json,
+  uuid,
+  boolean,
+} from "drizzle-orm/pg-core";
 
-export {}
+export const user = pgTable("User", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  email: varchar("email", { length: 64 }).notNull(),
+  password: varchar("password", { length: 64 }),
+});
+
+export type User = InferSelectModel<typeof user>;
+
+export const chat = pgTable("Chat", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp("createdAt").notNull(),
+  messages: json("messages").notNull(),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => user.id),
+});
+
+export type Chat = Omit<InferSelectModel<typeof chat>, "messages"> & {
+  messages: Array<Message>;
+};
+
+export const reservation = pgTable("Reservation", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp("createdAt").notNull(),
+  details: json("details").notNull(),
+  hasCompletedPayment: boolean("hasCompletedPayment").notNull().default(false),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => user.id),
+});
+
+export type Reservation = InferSelectModel<typeof reservation>;
