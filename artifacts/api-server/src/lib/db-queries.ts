@@ -35,13 +35,13 @@ export async function saveChat({
   if (selectedChats.length > 0) {
     return await db
       .update(chat)
-      .set({ messages: JSON.stringify(messages) })
+      .set({ messages })
       .where(eq(chat.id, id));
   }
   return await db.insert(chat).values({
     id,
     createdAt: new Date(),
-    messages: JSON.stringify(messages),
+    messages,
     userId,
   });
 }
@@ -75,7 +75,7 @@ export async function createReservation({
   return await db.insert(reservation).values({
     id,
     createdAt: new Date(),
-    details: JSON.stringify(details),
+    details,
     userId,
   });
 }

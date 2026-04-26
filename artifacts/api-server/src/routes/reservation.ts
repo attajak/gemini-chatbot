@@ -17,6 +17,10 @@ router.get("/reservation", requireAuth, async (req: AuthRequest, res) => {
     res.status(404).json({ error: "Not found" });
     return;
   }
+  if (reserv.userId !== req.user!.id) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
   res.json(reserv);
 });
 
@@ -25,6 +29,15 @@ router.patch("/reservation", requireAuth, async (req: AuthRequest, res) => {
   const { magicWord } = req.body;
   if (!id || typeof id !== "string") {
     res.status(400).json({ error: "Missing id" });
+    return;
+  }
+  const reserv = await getReservationById({ id });
+  if (!reserv) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  if (reserv.userId !== req.user!.id) {
+    res.status(403).json({ error: "Forbidden" });
     return;
   }
   const MAGIC_WORD = "vercel";
